@@ -28,6 +28,7 @@ class NanoMouseSensors {
     int leftReadings[numReadings];
     int frontReadings[numReadings];
     int rightReadings[numReadings];
+    
     int leftSmoothed;
     int frontSmoothed;
     int rightSmoothed;
@@ -64,9 +65,9 @@ class NanoMouseSensors {
       rightAmbient = analogRead(rightDetector);
 
       // Calculate Reflected value
-      leftReflected = leftCombined - leftAmbient;
-      frontReflected = frontCombined - frontAmbient;
-      rightReflected = rightCombined - rightAmbient;
+      leftReflected = (leftCombined - leftAmbient);
+      frontReflected = (frontCombined - frontAmbient) * 1.5; // * Factor para equilibrar valores (leds desiguales);
+      rightReflected = (rightCombined - rightAmbient) * 2.0; // * Factor para equilibrar valores (leds desiguales);
 
       // Smoothing
       leftTotal -= leftReadings[index];
@@ -85,9 +86,9 @@ class NanoMouseSensors {
       frontSmoothed = frontTotal / numReadings;
       rightSmoothed = rightTotal / numReadings;
 
-      left = leftSmoothed * 0.5;
-      front = frontSmoothed * 1.0;
-      right = rightSmoothed * 2.0;  // 2.0: Factor para equilibrar valores (leds desiguales)
+      left = leftSmoothed;
+      front = frontSmoothed;
+      right = rightSmoothed;
       
       index += 1;
 
@@ -95,7 +96,7 @@ class NanoMouseSensors {
         index = 0;
       }
       
-      view();
+      //view();
     }
 
     void initialize(){

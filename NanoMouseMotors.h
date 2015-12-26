@@ -11,7 +11,7 @@ class NanoMouseMotors {
     Servo leftServo;
     Servo rightServo;
 
-    static const byte power = 500;
+    static const byte power = 250;
 
   public:
 
@@ -22,8 +22,10 @@ class NanoMouseMotors {
 
     void forward() {
       leftServo.writeMicroseconds(1500 - power);
-      delay(80); // Delay porque la derecha se accionaba antes que la izquierda
-      rightServo.writeMicroseconds(1500 + power * 0.88); // La derecha avanza más rápida y se multiplica power*0.88
+      delay(10); // Delay porque la derecha se accionaba antes que la izquierda
+      rightServo.writeMicroseconds(1500 + power * 0.83); // La derecha avanza más rápida y se multiplica power*0.88
+      
+      delay(15);  // waits for the servo to get there 
     }
 
     void stop(int time = 500) {
@@ -40,7 +42,8 @@ class NanoMouseMotors {
 
     void turn(int direction, int degrees) {
       leftServo.writeMicroseconds(1500 + power * direction);
-      rightServo.writeMicroseconds(1500 + power * 0.88 * direction); // La derecha avanza más rápida y se multiplica power*0.88
+      delay(10);
+      rightServo.writeMicroseconds(1500 + power * 0.83 * direction); // La derecha avanza más rápida y se multiplica power*0.88
       if (direction == LEFT) {
         delay(degrees * 6.5);
       } else {
@@ -49,21 +52,21 @@ class NanoMouseMotors {
       stop();
     }
 
-    void polygon(unsigned int time, int sides) {
+    void polygon(int sides, int direction = RIGHT, unsigned int time = 2000) {
       for (int i = 0; i < sides; i++) {
         forwardTime(time);
-        turn(RIGHT, 360 / sides);
+        turn(direction, 360 / sides);
       }
     }
 
     void forwardProportional(int error) {
       // If error is (-) -> Turn the right
       // If error is (+) -> Turn the left
-      const float Kp = 5;
+      const float Kp = 2.5;
       float leftSpeed = ( (1500 - power) + Kp*error );
-      float rightSpeed = ( (1500 + power*0.88) + Kp*error ); // La derecha avanza más rápida y se multiplica power*0.88
+      float rightSpeed = ( (1500 + power*0.83) + Kp*error ); // La derecha avanza más rápida y se multiplica power*0.88
       
-      Serial.print("Motors: ");
+      /*Serial.print("Motors: ");
       Serial.print(leftSpeed - 1500);
       Serial.print(" - ");
       Serial.print(rightSpeed - 1500);
@@ -72,11 +75,13 @@ class NanoMouseMotors {
       Serial.print(" - ");
       Serial.print(rightSpeed);
       Serial.print("\tERROR: ");
-      Serial.println(error);  
+      Serial.println(error); */ 
       
       leftServo.writeMicroseconds(leftSpeed);
-      delay(80); // Delay porque la derecha se accionaba antes que la izquierda
+      delay(10); // Delay porque la derecha se accionaba antes que la izquierda
       rightServo.writeMicroseconds(rightSpeed);
+      
+      delay(15);  // waits for the servo to get there 
     }
     
 };
