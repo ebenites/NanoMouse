@@ -2,10 +2,11 @@
 
 template <byte leftEmitter, byte leftDetector, byte frontEmitter, byte frontDetector, byte rightEmitter, byte rightDetector>
 
-class NanoMouseSensors {
+class NanoMouseSensors
+{
 
   private:
-  
+
     // Used to store sensor values when the emitters are off
     int leftAmbient;
     int frontAmbient;
@@ -23,12 +24,12 @@ class NanoMouseSensors {
     int leftTotal;
     int frontTotal;
     int rightTotal;
-    static const byte numReadings = 20;
+    static const byte numReadings = 10;
     byte index;
     int leftReadings[numReadings];
     int frontReadings[numReadings];
     int rightReadings[numReadings];
-    
+
     int leftSmoothed;
     int frontSmoothed;
     int rightSmoothed;
@@ -39,18 +40,22 @@ class NanoMouseSensors {
     int front;
     int right;
 
-    void configure() {
+    void configure()
+    {
       pinMode(leftEmitter, OUTPUT);
       pinMode(frontEmitter, OUTPUT);
       pinMode(rightEmitter, OUTPUT);
     }
 
-    void sense() {
+    void sense() 
+    {
       // Sense combined
       digitalWrite(leftEmitter, HIGH);
       digitalWrite(frontEmitter, HIGH);
       digitalWrite(rightEmitter, HIGH);
+      
       delay(1);
+
       leftCombined = analogRead(leftDetector);
       frontCombined = analogRead(frontDetector);
       rightCombined = analogRead(rightDetector);
@@ -59,25 +64,27 @@ class NanoMouseSensors {
       digitalWrite(leftEmitter, LOW);
       digitalWrite(frontEmitter, LOW);
       digitalWrite(rightEmitter, LOW);
+      
       delay(1);
+
       leftAmbient = analogRead(leftDetector);
       frontAmbient = analogRead(frontDetector);
       rightAmbient = analogRead(rightDetector);
 
       // Calculate Reflected value
-      leftReflected = (leftCombined - leftAmbient);
-      frontReflected = (frontCombined - frontAmbient) * 1.5; // * Factor para equilibrar valores (leds desiguales);
-      rightReflected = (rightCombined - rightAmbient) * 2.0; // * Factor para equilibrar valores (leds desiguales);
+      leftReflected = (leftCombined - leftAmbient) * 1.4; // * Factor para equilibrar valores (leds desiguales);
+      frontReflected = (frontCombined - frontAmbient) * 1;
+      rightReflected = (rightCombined - rightAmbient) * 1;
 
       // Smoothing
       leftTotal -= leftReadings[index];
       frontTotal -= frontReadings[index];
       rightTotal -= rightReadings[index];
-      
+
       leftReadings[index] = leftReflected;
       frontReadings[index] = frontReflected;
       rightReadings[index] = rightReflected;
-      
+
       leftTotal += leftReadings[index];
       frontTotal += frontReadings[index];
       rightTotal += rightReadings[index];
@@ -89,24 +96,34 @@ class NanoMouseSensors {
       left = leftSmoothed;
       front = frontSmoothed;
       right = rightSmoothed;
-      
+
       index += 1;
 
       if (index >= numReadings) {
         index = 0;
       }
-      
+
       //view();
     }
 
-    void initialize(){
-      for(byte i = 0; i < numReadings; i++){
-        sense();  
-      }  
+    void initialize() 
+    {
+      for (byte i = 0; i < numReadings; i++) 
+      {
+        sense();
+      }
     }
 
-    void view() {
+    void halfInitialize() 
+    {
+      for (byte i = 0; i < numReadings/2; i++) 
+      {
+        sense();
+      }
+    }
 
+    void view() 
+    {
       Serial.print("Sensors: ");
       Serial.print(leftCombined);
       Serial.print("\t - ");
@@ -115,9 +132,9 @@ class NanoMouseSensors {
       Serial.print(leftReflected);
       Serial.print("\t -> ");
       Serial.print(left);
-      
+
       Serial.print("\t | \t");
-      
+
       Serial.print(frontCombined);
       Serial.print("\t - ");
       Serial.print(frontAmbient);
@@ -135,7 +152,6 @@ class NanoMouseSensors {
       Serial.print(rightReflected);
       Serial.print("\t -> ");
       Serial.println(right);
-
     }
 
 };
